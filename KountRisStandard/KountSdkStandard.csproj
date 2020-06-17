@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageId>Kount.Net.RisStandardSDK</PackageId>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Version>1.0.0</Version>
+	<Authors>Kount Inc.</Authors>
+  <Company>Kount</Company>
+  <PackageLicenseUrl>https://kount.com/</PackageLicenseUrl>
+  <Copyright>Kount Inc.</Copyright>
   </PropertyGroup>
 
 	<ItemGroup>
