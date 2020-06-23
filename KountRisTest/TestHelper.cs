@@ -1,14 +1,9 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="PredictiveResponseTest.cs" company="Kount Inc">
-//     Copyright Kount Inc. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
-namespace KountRisTest
+﻿
+namespace KountRisStandardTest
 {
     using Kount.Ris;
     using Kount.Enums;
     using System;
-
     public class TestHelper
     {
         public const string TEST_API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI5OTk2NjYiLCJhdWQiOiJLb3VudC4xIiwiaWF0IjoxNDk0NTM0Nzk5LCJzY3AiOnsia2EiOm51bGwsImtjIjpudWxsLCJhcGkiOmZhbHNlLCJyaXMiOnRydWV9fQ.eMmumYFpIF-d1up_mfxA5_VXBI41NSrNVe9CyhBUGck";

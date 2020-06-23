@@ -1,65 +1,88 @@
-﻿using Kount.Ris;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace KountRisTest
+﻿
+namespace KountRisStandardTest
 {
-    [TestClass]
+    using Kount.Ris;
+    using Microsoft.Extensions.Configuration;
+    using System.Configuration;
+    using System.IO;
+    using Xunit;
+
+
+
     public class ConfigurationTest
     {
-        public Configuration SUT;
+        public Kount.Ris.Configuration SUT;
 
-        [TestInitialize]
-        public void Setup()
+        
+        public ConfigurationTest()
         {
-            SUT = Configuration.FromAppSettings();
+            var builder = new ConfigurationBuilder()
+             .SetBasePath(Directory.GetCurrentDirectory())
+             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            IConfigurationRoot configuration = builder.Build();
+
+            ConfigurationManager.AppSettings["Ris.MerchantId"] = configuration.GetConnectionString("Ris.MerchantId");
+            ConfigurationManager.AppSettings["Ris.API.Key"] = configuration.GetConnectionString("Ris.API.Key");
+            ConfigurationManager.AppSettings["Ris.Config.Key"] = configuration.GetConnectionString("Ris.Config.Key");
+            ConfigurationManager.AppSettings["Ris.Url"] = configuration.GetConnectionString("Ris.Url");
+            ConfigurationManager.AppSettings["Ris.Version"] = configuration.GetConnectionString("Ris.Version");
+            ConfigurationManager.AppSettings["Ris.CertificateFile"] = configuration.GetConnectionString("Ris.CertificateFile");
+            ConfigurationManager.AppSettings["Ris.PrivateKeyPassword"] = configuration.GetConnectionString("Ris.PrivateKeyPassword");
+            ConfigurationManager.AppSettings["Ris.Connect.Timeout"] = configuration.GetConnectionString("Ris.Connect.Timeout");
+            ConfigurationManager.AppSettings["LOG.LOGGER"] = configuration.GetConnectionString("LOG.LOGGER");
+            ConfigurationManager.AppSettings["LOG.SIMPLE.LEVEL"] = configuration.GetConnectionString("LOG.SIMPLE.LEVEL");
+            ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"] = configuration.GetConnectionString("LOG.SIMPLE.ELAPSED");
+
+            SUT = Kount.Ris.Configuration.FromAppSettings();
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_Connect_Timeout()
         {
-            Assert.AreEqual(SUT.ConnectTimeout, "10000");
+            Assert.Equal("10000", SUT.ConnectTimeout);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_MerchantId()
         {
-            Assert.AreEqual(SUT.MerchantId, "000000");
+            Assert.Equal("000000", SUT.MerchantId);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_API_Key()
         {
-            Assert.AreEqual(SUT.ApiKey, "");
+            Assert.Equal("", SUT.ApiKey);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_Version()
         {
-            Assert.AreEqual(SUT.Version, "0700");
+            Assert.Equal("0700", SUT.Version);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_Url()
         {
-            Assert.AreEqual(SUT.URL, "https://risk.beta.kount.net");
+            Assert.Equal("https://risk.beta.kount.net", SUT.URL);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_CertificateFile()
         {
-            Assert.AreEqual(SUT.CertificateFile, "certificate.pfx");
+            Assert.Equal("certificate.pfx", SUT.CertificateFile);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_PrivateKeyPassword()
         {
-            Assert.AreEqual(SUT.PrivateKeyPassword, "11111111111111111");
+            Assert.Equal("11111111111111111", SUT.PrivateKeyPassword);
         }
 
-        [TestMethod]
+         [Fact]
         public void FromAppSettings_assigns_ConfigKey()
         {
-            Assert.AreEqual(SUT.ConfigKey, null);
+            Assert.NotNull(SUT.ConfigKey);
         }
     }
 }

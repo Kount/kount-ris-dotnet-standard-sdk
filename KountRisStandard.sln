@@ -3,17 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KountSdkStandard", "SDK\KountSdkStandard.csproj", "{136CADD7-FACD-458D-BB59-908819CEF3DD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountRisConfigTest", "KountRisConfigTest\KountRisConfigTest.csproj", "{04239662-33D5-4546-9032-77ECF8099202}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountRisTest", "KountRisTest\KountRisTest.csproj", "{BAB87665-80BB-48A3-BAC1-DC02DC47BB55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KountSdkStandard", "KountRisStandard\KountSdkStandard.csproj", "{136CADD7-FACD-458D-BB59-908819CEF3DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A3B099B0-AA9B-4414-95F5-B687556CB610}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{B01ED076-3231-4E0D-B9F1-14DDE0DE065F}"
 	ProjectSection(SolutionItems) = preProject
-		ProjectSection(SolutionItems) = preProject
 		builds\build_sdk.bat = builds\build_sdk.bat
 		builds\buildSdk.ps1 = builds\buildSdk.ps1
 		builds\create_nuGet_package.bat = builds\create_nuGet_package.bat
@@ -23,7 +18,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{B01ED0
 		builds\Test-ServerSSLSupport.ps1 = builds\Test-ServerSSLSupport.ps1
 		builds\zipBuild.ps1 = builds\zipBuild.ps1
 	EndProjectSection
-	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountRisTest", "KountRisTest\KountRisTest.csproj", "{64A74665-E0FA-4CE9-9C76-DAD25D50A355}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KountRisConfigTest", "KountRisConfigTest\KountRisConfigTest.csproj", "{B7E3E176-C0EF-4F51-A8BD-264F957B6538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +33,14 @@ Global
 		{136CADD7-FACD-458D-BB59-908819CEF3DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{136CADD7-FACD-458D-BB59-908819CEF3DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{136CADD7-FACD-458D-BB59-908819CEF3DD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04239662-33D5-4546-9032-77ECF8099202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04239662-33D5-4546-9032-77ECF8099202}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04239662-33D5-4546-9032-77ECF8099202}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04239662-33D5-4546-9032-77ECF8099202}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BAB87665-80BB-48A3-BAC1-DC02DC47BB55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BAB87665-80BB-48A3-BAC1-DC02DC47BB55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BAB87665-80BB-48A3-BAC1-DC02DC47BB55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BAB87665-80BB-48A3-BAC1-DC02DC47BB55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64A74665-E0FA-4CE9-9C76-DAD25D50A355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64A74665-E0FA-4CE9-9C76-DAD25D50A355}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64A74665-E0FA-4CE9-9C76-DAD25D50A355}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64A74665-E0FA-4CE9-9C76-DAD25D50A355}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7E3E176-C0EF-4F51-A8BD-264F957B6538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7E3E176-C0EF-4F51-A8BD-264F957B6538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7E3E176-C0EF-4F51-A8BD-264F957B6538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7E3E176-C0EF-4F51-A8BD-264F957B6538}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

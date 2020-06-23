@@ -1,17 +1,14 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="RisValidatorIPADTest.cs" company="Keynetics Inc">
-//     Copyright  Kount Inc. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
-namespace KountRisTest
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace KountRisStandardTest
 {
     using Kount.Ris;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    /// <summary>
-    /// Test RisValidator for IPv4 and IPv6 address validity.
-    /// </summary>
-    [TestClass]
+    using Microsoft.Extensions.Configuration;
+    using System.Configuration;
+    using System.IO;
+    using Xunit;
     public class RisValidatorIpAddressTest
     {
         //Fields
@@ -19,16 +16,33 @@ namespace KountRisTest
         private string _orderNum = "";
         private Inquiry inquiry;
 
-        [TestInitialize]
-        public void Initialize()
+        public RisValidatorIpAddressTest()
         {
             this.inquiry = TestHelper.DefaultInquiry(out _sid, out _orderNum);
             this.inquiry.SetNoPayment();
+
+            var builder = new ConfigurationBuilder()
+             .SetBasePath(Directory.GetCurrentDirectory())
+             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            IConfigurationRoot configuration = builder.Build();
+
+            ConfigurationManager.AppSettings["Ris.MerchantId"] = configuration.GetConnectionString("Ris.MerchantId");
+            ConfigurationManager.AppSettings["Ris.API.Key"] = configuration.GetConnectionString("Ris.API.Key");
+            ConfigurationManager.AppSettings["Ris.Config.Key"] = configuration.GetConnectionString("Ris.Config.Key");
+            ConfigurationManager.AppSettings["Ris.Url"] = configuration.GetConnectionString("Ris.Url");
+            ConfigurationManager.AppSettings["Ris.Version"] = configuration.GetConnectionString("Ris.Version");
+            ConfigurationManager.AppSettings["Ris.CertificateFile"] = configuration.GetConnectionString("Ris.CertificateFile");
+            ConfigurationManager.AppSettings["Ris.PrivateKeyPassword"] = configuration.GetConnectionString("Ris.PrivateKeyPassword");
+            ConfigurationManager.AppSettings["Ris.Connect.Timeout"] = configuration.GetConnectionString("Ris.Connect.Timeout");
+            ConfigurationManager.AppSettings["LOG.LOGGER"] = configuration.GetConnectionString("LOG.LOGGER");
+            ConfigurationManager.AppSettings["LOG.SIMPLE.LEVEL"] = configuration.GetConnectionString("LOG.SIMPLE.LEVEL");
+            ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"] = configuration.GetConnectionString("LOG.SIMPLE.ELAPSED");
         }
 
         #region IPv6
 
-        [TestMethod]
+        [Fact]
         public void TestPassingIpv6_ValidWithNoCollapse()
         {
             // Arrange
@@ -40,8 +54,8 @@ namespace KountRisTest
 
             // Assert - Expects no exception
         }
-        
-        [TestMethod]
+
+        [Fact]
         public void TestPassingIpv6_ValidWithCollapse()
         {
             // Arrange
@@ -54,7 +68,7 @@ namespace KountRisTest
             // Assert - Expects no exception
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPassingIpv6_LoopbackCompressed()
         {
             // Arrange
@@ -67,7 +81,7 @@ namespace KountRisTest
             // Assert - Expects exception
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPassingIpv6_IPv4AddressesAsDottedQuads()
         {
             // Arrange
@@ -80,7 +94,7 @@ namespace KountRisTest
             // Assert - Expects exception
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPassingIpv6_IPv4MappedIPv6Address()
         {
             // Arrange
@@ -93,7 +107,7 @@ namespace KountRisTest
             // Assert - Expects exception
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPassingIpv6_IPv4MappedIPv6AddressCompressed()
         {
             // Arrange
@@ -106,123 +120,186 @@ namespace KountRisTest
             // Assert - Expects exception
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_NotAllowedCharacters()
         {
             // Arrange
             // Characters that are not allowed
-            inquiry.SetIpAddress("2001:0:3238:mech:63::FEFB");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("2001:0:3238:mech:63::FEFB");
 
-            // Act
-            Response response = inquiry.GetResponse();
-
+                // Act
+                Response response = inquiry.GetResponse();
+            }
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
+
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_ExtraZerroNotAllowed()
         {
             // Arrange
             // extra 0 not allowed
-            inquiry.SetIpAddress("02001:0000:1234:0000:0000:C1C0:ABCD:0876");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("02001:0000:1234:0000:0000:C1C0:ABCD:0876");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
+            }
 
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_JunkAfterValidAddress()
         {
             // Arrange
             // junk after valid address
-            inquiry.SetIpAddress("2001:0000:1234:0000:0000:C1C0:ABCD:0876  0");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("2001:0000:1234:0000:0000:C1C0:ABCD:0876  0");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
+            }
 
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_InternalSpace()
         {
             // Arrange
             // internal space
-            inquiry.SetIpAddress("2001:0000:1234:0000:0000:C1C0:ABCD:0876  0");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("2001:0000:1234:0000:0000:C1C0:ABCD:0876  0");
 
-            // Act
-            Response response = inquiry.GetResponse();
-
+                // Act
+                Response response = inquiry.GetResponse();
+            }
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_SevenSegments()
         {
             // Arrange
             // seven segments
-            inquiry.SetIpAddress("3ffe:0b00:0000:0001:0000:0000:000a");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("3ffe:0b00:0000:0001:0000:0000:000a");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
+            }
 
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_NineSegments()
         {
             // Arrange
             // Nine segments
-            inquiry.SetIpAddress("FF02:0000:0000:0000:0000:0000:0000:0000:0001");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("FF02:0000:0000:0000:0000:0000:0000:0000:0001");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
+            }
 
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_DoubleColons()
         {
             // Arrange
             // double "::"
-            inquiry.SetIpAddress("3ffe:b00::1::a");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("3ffe:b00::1::a");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
+            }
 
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv6_DoubleColonsStartAndEnd()
         {
             // Arrange
             // double "::"
-            inquiry.SetIpAddress("::1111:2222:3333:4444:5555:6666::");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("::1111:2222:3333:4444:5555:6666::");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
+            }
 
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
         #endregion
 
         #region IPv4
-        
-        [TestMethod]
+
+        [Fact]
         public void TestPassingIpv4Local()
         {
             // Arrange
@@ -233,21 +310,30 @@ namespace KountRisTest
 
             // Assert - Expects no exception
         }
-        
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+
+        [Fact]
         public void TestFailingIpv4Local()
         {
             // Arrange
-            inquiry.SetIpAddress("192.1.100.2048");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("192.1.100.2048");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
 
+            }
+
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
-        
-        [TestMethod]
+
+        [Fact]
         public void TestPassingIpv4()
         {
             // Arrange
@@ -258,33 +344,51 @@ namespace KountRisTest
 
             // Assert - Expects no exception
         }
-        
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+
+        [Fact]
         public void TestFailingIpv4_ThreeSegments()
         {
             // Arrange
             // Three segments
-            inquiry.SetIpAddress("8.8.8");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("8.8.8");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
 
+            }
+
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Kount.Ris.ValidationException))]
+        [Fact]
         public void TestFailingIpv4_OutOfRange()
         {
             // Arrange
             // 256 is out of range
-            inquiry.SetIpAddress("127.0.0.256");
+            bool validationError = false;
+            try
+            {
+                inquiry.SetIpAddress("127.0.0.256");
 
-            // Act
-            Response response = inquiry.GetResponse();
+                // Act
+                Response response = inquiry.GetResponse();
 
+            }
+
+            catch (ValidationException ee)
+            {
+                validationError = true;
+            }
             // Assert - Expects exception
+            Assert.True(validationError, "Validation error occured");
         }
 
         #endregion

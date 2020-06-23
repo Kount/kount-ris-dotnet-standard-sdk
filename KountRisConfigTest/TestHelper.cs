@@ -3,7 +3,7 @@
 //     Copyright Kount Inc. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-namespace KountRisConfigTest
+namespace KountRisStandardConfigTest
 {
     using Kount.Ris;
     using Kount.Enums;
@@ -42,7 +42,7 @@ namespace KountRisConfigTest
         /// <summary>
         /// Last 4 numbers of Credit Card Value
         /// </summary>
-        private const string LAST4 = "1111";
+        private const string LAST4 = "2514";
 
         /// <summary>
         /// Billing street address - Line 1

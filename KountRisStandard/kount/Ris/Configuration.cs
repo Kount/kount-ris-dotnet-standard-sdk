@@ -23,13 +23,14 @@ namespace Kount.Ris
                 ApiKey = ConfigurationManager.AppSettings["Ris.API.Key"],
                 CertificateFile = ConfigurationManager.AppSettings["Ris.CertificateFile"],
                 PrivateKeyPassword = ConfigurationManager.AppSettings["Ris.PrivateKeyPassword"],
+                LogSimpleElapsed = ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"]
             };
         }
 
         /// <summary>
         /// Six digit identifier issued by Kount.
         /// </summary>
-        public string MerchantId {get; set; }
+        public string MerchantId { get; set; }
 
         /// <summary>
         /// HTTPS URL path to the company's servers provided in boarding documentation from Kount.
@@ -65,5 +66,10 @@ namespace Kount.Ris
         /// Password used to export the certificate
         /// </summary>
         public string PrivateKeyPassword { get; set; }
+
+        /// <summary>
+        /// Read LogElapsedTime from config
+        /// </summary>
+        public string LogSimpleElapsed { get; set; }
     }
 }

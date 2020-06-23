@@ -6,8 +6,6 @@
 namespace Kount.Ris
 {
     using Kount.Enums;
-    using Kount.Log.Binding;
-    using Kount.Log.Factory;
     using Kount.Util;
     using System;
     using System.Collections;
@@ -29,8 +27,8 @@ namespace Kount.Ris
     /// </summary>
     public abstract class Request
     {
-        private const string CUSTOM_HEADER_MERCHANT_ID = "X-Kount-Merc-Id"; 
-        private const string CUSTOM_HEADER_API_KEY = "X-Kount-Api-Key";     
+        private const string CUSTOM_HEADER_MERCHANT_ID = "X-Kount-Merc-Id";
+        private const string CUSTOM_HEADER_API_KEY = "X-Kount-Api-Key";
 
         /// <summary>
         /// The RIS version
@@ -40,7 +38,7 @@ namespace Kount.Ris
         /// <summary>
         /// The Logger to use.
         /// </summary>
-        private ILogger logger;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(typeof(Request));
 
         /// <summary>
         /// Hash table of request data.
@@ -73,6 +71,11 @@ namespace Kount.Ris
         private string apiKey = null;
 
         /// <summary>
+        /// API key used for get configuration value of logTimeElapsed.
+        /// </summary>
+        private bool logTimeElapsed;
+
+        /// <summary>
         /// Construct a request object. Set the static setting from the
         /// web.config file.
         /// </summary>
@@ -85,18 +88,18 @@ namespace Kount.Ris
         /// static data missing for a RIS request.</exception>
         protected Request(bool checkConfiguration, Configuration configuration)
         {
-            ILoggerFactory factory = LogFactory.GetLoggerFactory();
-            this.logger = factory.GetLogger(typeof(Request).ToString());
-
             if (checkConfiguration)
             {
                 this.CheckConfigurationParameter(configuration.MerchantId, nameof(configuration.MerchantId));
                 this.CheckConfigurationParameter(configuration.URL, nameof(configuration.URL));
                 this.CheckConfigurationParameter(configuration.ConfigKey, nameof(configuration.ConfigKey));
             }
-            
-            // timeout must be always defined
+
+
             this.CheckConfigurationParameter(configuration.ConnectTimeout, nameof(configuration.ConnectTimeout));
+            logTimeElapsed = (String.IsNullOrEmpty(configuration.LogSimpleElapsed)
+               ? false
+               : configuration.LogSimpleElapsed.Trim().ToLower().Equals("on"));
 
             this.data = new System.Collections.Hashtable();
             this.SetMerchantId(Int32.Parse(configuration.MerchantId));
@@ -156,8 +159,8 @@ namespace Kount.Ris
         /// <returns>Kount.Ris.Response populated object.</returns>
         public Kount.Ris.Response GetResponse(bool validate = true)
         {
-            this.logger.Debug($"Kount.Ris.Request.GetResponse() - RIS endpoint URL: {this.url}");
-            this.logger.Debug($"PTOK [{this.SafeGet("PTOK")}]");
+            logger.Debug($"Kount.Ris.Request.GetResponse() - RIS endpoint URL: {this.url}");
+            logger.Debug($"PTOK [{this.SafeGet("PTOK")}]");
             string ptok = this.Data.ContainsKey("PTOK") ? (string)this.Data["PTOK"] : "";
 
             if (ptok.Equals("") && "KHASH".Equals((string)this.Data["PENC"]))
@@ -168,20 +171,20 @@ namespace Kount.Ris
             IList errors = this.Validate(this.data);
             if (errors.Count > 0)
             {
-                getErrorList(validate,errors);
+                getErrorList(validate, errors);
 
                 #region validation Error
-                //string errorMsg = "";
-                //foreach (ValidationError error in errors)
-                //{
-                //    errorMsg += error.ToString() + "\n";
-                //}
+                string errorMsg = "";
+                foreach (ValidationError error in errors)
+                {
+                    errorMsg += error.ToString() + "\n";
+                }
 
-                //this.logger.Error("The following data validation errors occurred: " + errorMsg);
-                //if (validate)
-                //{
-                //    throw new Kount.Ris.ValidationException(errorMsg);
-                //}
+                logger.Error("The following data validation errors occurred: " + errorMsg);
+                if (validate)
+                {
+                    throw new Kount.Ris.ValidationException(errorMsg);
+                }
                 #endregion
 
 
@@ -200,7 +203,7 @@ namespace Kount.Ris
                     value = "payment token hidden";
                 };
 
-                this.logger.Debug("[" + param.Key + "]=" + value);
+                logger.Debug("[" + param.Key + "]=" + value);
             }
 
             post = post.TrimEnd('&');
@@ -218,17 +221,17 @@ namespace Kount.Ris
             webReq.ContentType = "application/x-www-form-urlencoded";
             webReq.ContentLength = buffer.Length;
 
-            this.logger.Debug("Setting merchant ID header.");
+            logger.Debug("Setting merchant ID header.");
             webReq.Headers[CUSTOM_HEADER_MERCHANT_ID] = this.GetParam("MERC");
 
             if (null != this.apiKey)
             {
-                this.logger.Debug("Setting API key header.");
+                logger.Debug("Setting API key header.");
                 webReq.Headers[CUSTOM_HEADER_API_KEY] = this.apiKey;
             }
             else
             {
-                this.logger.Debug("API key header not found, setting certificate");
+                logger.Debug("API key header not found, setting certificate");
                 //// Add the RIS signed authentication certificate to the payload
                 //// See Kount Technical Specifications Guide for details on
                 //// requesting and exporting
@@ -244,7 +247,7 @@ namespace Kount.Ris
             }
 
 
-            string risString=String.Empty;
+            string risString = String.Empty;
             var stopwatch = new Stopwatch();
 
             // start measure elapsed time between request and response
@@ -275,7 +278,7 @@ namespace Kount.Ris
                         error = this.GetWebError(ex.Response);
                     }
                 }
-                this.logger.Debug("ERROR - The following web error occurred: " + error);
+                logger.Debug("ERROR - The following web error occurred: " + error);
                 throw new Kount.Ris.RequestException(error);
             }
 
@@ -295,7 +298,7 @@ namespace Kount.Ris
             }
 
             var elapsed = stopwatch.ElapsedMilliseconds.ToString();
-            if (this.logger.MeasureElapsed)
+            if (logTimeElapsed)
             {
                 GetElapsedLogger(elapsed);
                 #region Elapsed Logger
@@ -309,7 +312,7 @@ namespace Kount.Ris
 
             }
 
-            this.logger.Debug("End GetResponse()");
+            logger.Debug("End GetResponse()");
             return new Kount.Ris.Response(risString);
         }
 
@@ -321,7 +324,7 @@ namespace Kount.Ris
                 errorMsg += error.ToString() + "\n";
             }
 
-            this.logger.Error("The following data validation errors occurred: " + errorMsg);
+            logger.Error("The following data validation errors occurred: " + errorMsg);
             if (validate)
             {
                 throw new Kount.Ris.ValidationException(errorMsg);
@@ -336,7 +339,7 @@ namespace Kount.Ris
             builder.Append(" SESS = ").Append(GetParam("SESS"));
             builder.Append(" SDK_ELAPSED = ").Append(elapsed).Append(" ms.");
 
-            this.logger.Debug(builder.ToString());
+            logger.Debug(builder.ToString());
         }
 
         /// <summary>
@@ -489,7 +492,7 @@ namespace Kount.Ris
         [Obsolete("Version 6.5.0 Use Kount.Ris.Request.SetPayment(Enums.PaymentTypes paymentType, string payerId) : void")]
         public void SetPayment(string ptyp, string ptok)
         {
-            this.logger.Debug("Kount.Ris.Request.SetPayment()");
+            logger.Debug("Kount.Ris.Request.SetPayment()");
             this.Data["PTYP"] = ptyp;
             this.SetPaymentToken(this.SafeGet(ptok));
         }
@@ -594,12 +597,12 @@ namespace Kount.Ris
             }
 
             string res = this.Data[param] as string;
-            if (res==null)
+            if (res == null)
             {
                 var val = this.Data[param] as int?;
                 if (val.HasValue)
                 {
-                    res = val.Value.ToString(); 
+                    res = val.Value.ToString();
                 }
             }
             return res ?? String.Empty;
@@ -672,7 +675,7 @@ namespace Kount.Ris
             string message = "The method " +
                 "Kount.Ris.Request.SetKhashPaymentEncoding() is obsolete. " +
                 "Use Kount.Ris.Request.SetKhashPaymentEncoding(bool) instead.";
-            this.logger.Info(message);
+            logger.Info(message);
             this.Data["PENC"] = "KHASH";
         }
 
@@ -760,7 +763,7 @@ namespace Kount.Ris
         {
             if (null == value)
             {
-                this.logger.Error($"Configuration parameter [{parameter}] not defined.");
+                logger.Error($"Configuration parameter [{parameter}] not defined.");
                 throw new Kount.Ris.RequestException(
                     $"[{parameter}] must be defined in the application configuration file.");
             }
@@ -974,7 +977,7 @@ namespace Kount.Ris
         private IList Validate(Hashtable data)
         {
             IList errors = new ArrayList();
-            this.logger.Debug("start validate()");
+            logger.Debug("start validate()");
             var doc = new XmlDocument();
 
             using (Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream("KountSdkStandard.validate.xml"))
@@ -1009,7 +1012,7 @@ namespace Kount.Ris
                         && ((0 == modes.Count)
                           || ((0 < modes.Count) && (null != required.SelectSingleNode($"mode[. ='{mode}']")))))
                     {
-                        this.logger.Error($"Validate XML loop. Missing required field [{name}], Mode [{mode}]");
+                        logger.Error($"Validate XML loop. Missing required field [{name}], Mode [{mode}]");
                         errors.Add(new ValidationError(name, mode.ToString()));
                     }
                 }
@@ -1114,7 +1117,7 @@ namespace Kount.Ris
                 && ((null != (maxLength = node.SelectSingleNode("max_length")))
                 && (Int32.Parse(maxLength.InnerText) < dataValue.Length)))
             {
-                this.logger.Error($"Validate error: Field [{name}] is too long. Value [{this.Data[name]}]");
+                logger.Error($"Validate error: Field [{name}] is too long. Value [{this.Data[name]}]");
                 var length = Int32.Parse(maxLength.InnerText);
                 errors.Add(new ValidationError(name, dataValue, length));
             }
@@ -1131,7 +1134,7 @@ namespace Kount.Ris
                 }
                 catch (System.ArgumentException sysarg)
                 {
-                    this.logger.Error($"Regexp validation failed. Field [{name}], Value [{this.Data[name]}], Pattern [{regex.InnerText}]", sysarg);
+                    logger.Error($"Regexp validation failed. Field [{name}], Value [{this.Data[name]}], Pattern [{regex.InnerText}]", sysarg);
                     errors.Add(new ValidationError(name, dataValue, regex.InnerText));
                 }
             }
