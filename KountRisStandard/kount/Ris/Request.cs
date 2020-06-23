@@ -88,6 +88,15 @@ namespace Kount.Ris
         /// static data missing for a RIS request.</exception>
         protected Request(bool checkConfiguration, Configuration configuration)
         {
+            XmlDocument log4netConfig = new XmlDocument();
+
+            log4netConfig.Load(System.IO.File.OpenRead("log4net.config"));
+
+            var repo = log4net.LogManager.CreateRepository(
+           Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
+
+            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
+
             if (checkConfiguration)
             {
                 this.CheckConfigurationParameter(configuration.MerchantId, nameof(configuration.MerchantId));

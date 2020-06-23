@@ -9,7 +9,9 @@ namespace Kount.Ris
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Text.RegularExpressions;
+    using System.Xml;
 
     /// <summary>
     /// Response immutable data object containing data from the RIS server.<br/>
@@ -46,6 +48,16 @@ namespace Kount.Ris
         /// populating a hash for getters.</param>
         public Response(string raw)
         {
+
+            XmlDocument log4netConfig = new XmlDocument();
+
+            log4netConfig.Load(System.IO.File.OpenRead("log4net.config"));
+
+            var repo = log4net.LogManager.CreateRepository(
+           Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
+
+            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
+
             logger.Debug("RIS Response:\n" + raw);
             this.raw = raw;
             string[] lines = Regex.Split(raw, "[\r\n]+");

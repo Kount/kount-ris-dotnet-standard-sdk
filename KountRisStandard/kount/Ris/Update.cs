@@ -6,6 +6,8 @@
 namespace Kount.Ris
 {
     using System;
+    using System.Reflection;
+    using System.Xml;
 
     /// <summary>
     /// Update class. A bunch of setters for sending transaction update <br/>
@@ -37,6 +39,15 @@ namespace Kount.Ris
         /// </summary>
         public Update() : base()
         {
+            XmlDocument log4netConfig = new XmlDocument();
+
+            log4netConfig.Load(System.IO.File.OpenRead("log4net.config"));
+
+            var repo = log4net.LogManager.CreateRepository(
+           Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
+
+            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
+
             this.SetMode(Enums.UpdateTypes.ModeU);
         }
 
@@ -50,6 +61,15 @@ namespace Kount.Ris
         /// `Ris.Config.Key` and `Ris.Connect.Timeout` are set.</param>
         public Update(bool checkConfiguration) : base(checkConfiguration)
         {
+            XmlDocument log4netConfig = new XmlDocument();
+
+            log4netConfig.Load(System.IO.File.OpenRead("log4net.config"));
+
+            var repo = log4net.LogManager.CreateRepository(
+           Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
+
+            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
+
             this.SetMode(Enums.UpdateTypes.ModeU);
         }
 
@@ -64,6 +84,15 @@ namespace Kount.Ris
         /// <param name="configuration">Configuration class with raw values</param>
         public Update(bool checkConfiguration, Configuration configuration) : base(checkConfiguration, configuration)
         {
+            XmlDocument log4netConfig = new XmlDocument();
+
+            log4netConfig.Load(System.IO.File.OpenRead("log4net.config"));
+
+            var repo = log4net.LogManager.CreateRepository(
+           Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
+
+            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
+
             this.SetMode(Enums.UpdateTypes.ModeU);
         }
 
