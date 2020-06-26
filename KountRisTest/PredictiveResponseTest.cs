@@ -14,6 +14,7 @@ namespace KountRisStandardTest
     using Microsoft.Extensions.Configuration;
     using System.IO;
     using System.Configuration;
+    using Xunit.Abstractions;
 
     /// <summary>
     /// Those tests ensuring the customer's credentials are valid,
@@ -24,7 +25,7 @@ namespace KountRisStandardTest
     /// <b>Copyright:</b> 2017 Kount Inc. All Rights Reserved.<br/>
     /// </summary>
 
-    public class PredictiveResponseTest
+    public class PredictiveResponseTest : TestBase
     {
         private const string API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI5OTk2NjYiLCJhdWQiOiJLb3VudC4xIiwiaWF0IjoxNDk0NTM0Nzk5LCJzY3AiOnsia2EiOm51bGwsImtjIjpudWxsLCJhcGkiOmZhbHNlLCJyaXMiOnRydWV9fQ.eMmumYFpIF-d1up_mfxA5_VXBI41NSrNVe9CyhBUGck";
         private const int MERCHANT_ID = 999666;
@@ -72,26 +73,8 @@ namespace KountRisStandardTest
         private string _sid;
         private string _orderNum;
 
-        public PredictiveResponseTest()
-        {
-            var builder = new ConfigurationBuilder()
-             .SetBasePath(Directory.GetCurrentDirectory())
-             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-            IConfigurationRoot configuration = builder.Build();
-
-            ConfigurationManager.AppSettings["Ris.MerchantId"] = configuration.GetConnectionString("Ris.MerchantId");
-            ConfigurationManager.AppSettings["Ris.API.Key"] = configuration.GetConnectionString("Ris.API.Key");
-            ConfigurationManager.AppSettings["Ris.Config.Key"] = configuration.GetConnectionString("Ris.Config.Key");
-            ConfigurationManager.AppSettings["Ris.Url"] = configuration.GetConnectionString("Ris.Url");
-            ConfigurationManager.AppSettings["Ris.Version"] = configuration.GetConnectionString("Ris.Version");
-            ConfigurationManager.AppSettings["Ris.CertificateFile"] = configuration.GetConnectionString("Ris.CertificateFile");
-            ConfigurationManager.AppSettings["Ris.PrivateKeyPassword"] = configuration.GetConnectionString("Ris.PrivateKeyPassword");
-            ConfigurationManager.AppSettings["Ris.Connect.Timeout"] = configuration.GetConnectionString("Ris.Connect.Timeout");
-            ConfigurationManager.AppSettings["LOG.LOGGER"] = configuration.GetConnectionString("LOG.LOGGER");
-            ConfigurationManager.AppSettings["LOG.SIMPLE.LEVEL"] = configuration.GetConnectionString("LOG.SIMPLE.LEVEL");
-            ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"] = configuration.GetConnectionString("LOG.SIMPLE.ELAPSED");
-        }
+        public PredictiveResponseTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
+       
         private Inquiry CreateInquiry()
         {
             Inquiry inquiry = new Inquiry(false);

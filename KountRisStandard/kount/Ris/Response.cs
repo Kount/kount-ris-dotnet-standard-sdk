@@ -9,9 +9,8 @@ namespace Kount.Ris
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Reflection;
     using System.Text.RegularExpressions;
-    using System.Xml;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Response immutable data object containing data from the RIS server.<br/>
@@ -19,13 +18,8 @@ namespace Kount.Ris
     /// <b>Version:</b> 7.0.0. <br/>
     /// <b>Copyright:</b> 2020 Kount Inc <br/>
     /// </summary>
-    public class Response
+    public class Response : LoggingComponent
     {
-        /// <summary>
-        /// The logger to use
-        /// </summary>
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(typeof(Response));
-
         /// <summary>
         /// Response hashtable
         /// </summary>
@@ -46,19 +40,11 @@ namespace Kount.Ris
         /// </summary>
         /// <param name="raw">Splits name=value formatted response string
         /// populating a hash for getters.</param>
-        public Response(string raw)
+        /// <param name="logger">ILogger object for logging output</param>
+        public Response(string raw, ILogger logger = null) : base(logger)
         {
 
-            XmlDocument log4netConfig = new XmlDocument();
-
-            log4netConfig.Load(System.IO.File.OpenRead("log4net.config"));
-
-            var repo = log4net.LogManager.CreateRepository(
-           Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
-
-            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
-
-            logger.Debug("RIS Response:\n" + raw);
+            //logger.LogDebug("RIS Response:\n" + raw);
             this.raw = raw;
             string[] lines = Regex.Split(raw, "[\r\n]+");
             foreach (string line in lines)
@@ -162,7 +148,7 @@ namespace Kount.Ris
             string message = "The method " +
                 "Kount.Ris.Response.GetReason() is obsolete. Use " +
                 "Kount.Ris.Response.GetReasonCode() instead.";
-            logger.Info(message);
+            logger.LogInformation(message);
             return (string)this.response["REAS"];
         }
 
@@ -689,7 +675,7 @@ namespace Kount.Ris
             }
             catch (Exception nfe)
             {
-                logger.Error(
+                logger.LogError(
                         "RIS returned a RULES_TRIGGERED field " +
                         "which could not be parsed to a number",
                         nfe);
@@ -733,7 +719,7 @@ namespace Kount.Ris
             }
             catch (Exception nfe)
             {
-                logger.Error(
+                logger.LogError(
                         "RIS returned a WARNING_COUNT field " +
                         "which could not be parsed to a number",
                         nfe);
@@ -777,7 +763,7 @@ namespace Kount.Ris
             }
             catch (Exception nfe)
             {
-                logger.Error(
+                logger.LogError(
                         "RIS returned an ERROR_COUNT field which could " +
                         "not be parsed to a number",
                         nfe);
@@ -860,7 +846,7 @@ namespace Kount.Ris
             }
             catch (Exception nfe)
             {
-                logger.Error(
+                logger.LogError(
                     "RIS returned a COUNTERS_TRIGGERED field " +
                     "which could not be parsed to a number",
                     nfe);
@@ -917,7 +903,7 @@ namespace Kount.Ris
             }
             catch (Exception e)
             {
-                logger.Error("KC_WARNING_COUNT doesn't contain a number", e);
+                logger.LogError("KC_WARNING_COUNT doesn't contain a number", e);
             }
 
             return count;
@@ -960,7 +946,7 @@ namespace Kount.Ris
             }
             catch (Exception e)
             {
-                logger.Error("KC_ERROR_COUNT doesn't contain a number", e);
+                logger.LogError("KC_ERROR_COUNT doesn't contain a number", e);
             }
 
             return count;
@@ -985,7 +971,7 @@ namespace Kount.Ris
             }
             catch (Exception e)
             {
-                logger.Error("KC_ERROR_COUNT doesn't contain a number", e);
+                logger.LogError("KC_ERROR_COUNT doesn't contain a number", e);
             }
 
             return count;

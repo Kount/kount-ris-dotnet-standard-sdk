@@ -9,37 +9,21 @@ namespace KountRisStandardTest
     using System.Configuration;
     using System.IO;
     using Xunit;
-    public class RisValidatorIpAddressTest
+    using Xunit.Abstractions;
+
+    public class RisValidatorIpAddressTest : TestBase
     {
         //Fields
         private string _sid = "";
         private string _orderNum = "";
         private Inquiry inquiry;
 
-        public RisValidatorIpAddressTest()
+        public RisValidatorIpAddressTest(ITestOutputHelper outputHelper) : base(outputHelper)
         {
-            this.inquiry = TestHelper.DefaultInquiry(out _sid, out _orderNum);
+            this.inquiry = TestHelper.DefaultInquiry(out _sid, out _orderNum, logger);
             this.inquiry.SetNoPayment();
-
-            var builder = new ConfigurationBuilder()
-             .SetBasePath(Directory.GetCurrentDirectory())
-             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-            IConfigurationRoot configuration = builder.Build();
-
-            ConfigurationManager.AppSettings["Ris.MerchantId"] = configuration.GetConnectionString("Ris.MerchantId");
-            ConfigurationManager.AppSettings["Ris.API.Key"] = configuration.GetConnectionString("Ris.API.Key");
-            ConfigurationManager.AppSettings["Ris.Config.Key"] = configuration.GetConnectionString("Ris.Config.Key");
-            ConfigurationManager.AppSettings["Ris.Url"] = configuration.GetConnectionString("Ris.Url");
-            ConfigurationManager.AppSettings["Ris.Version"] = configuration.GetConnectionString("Ris.Version");
-            ConfigurationManager.AppSettings["Ris.CertificateFile"] = configuration.GetConnectionString("Ris.CertificateFile");
-            ConfigurationManager.AppSettings["Ris.PrivateKeyPassword"] = configuration.GetConnectionString("Ris.PrivateKeyPassword");
-            ConfigurationManager.AppSettings["Ris.Connect.Timeout"] = configuration.GetConnectionString("Ris.Connect.Timeout");
-            ConfigurationManager.AppSettings["LOG.LOGGER"] = configuration.GetConnectionString("LOG.LOGGER");
-            ConfigurationManager.AppSettings["LOG.SIMPLE.LEVEL"] = configuration.GetConnectionString("LOG.SIMPLE.LEVEL");
-            ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"] = configuration.GetConnectionString("LOG.SIMPLE.ELAPSED");
         }
-
+       
         #region IPv6
 
         [Fact]

@@ -3,9 +3,10 @@
 //     Copyright Keynetics. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Kount.Ris
 {
-
+    using Microsoft.Extensions.Logging;
     /// <summary>
     /// Inquiry class. A bunch of setters for sending initial transaction
     /// data to a Kount RIS server.<br/>
@@ -19,8 +20,9 @@ namespace Kount.Ris
         /// Constructor. Sets the mode to 'Q', the currency to 'USD' and sets
         /// the SDK identifier value. Use SetMode(char) and SetCurrency(string)
         /// to change the RIS mode and currency respectively.
+        /// <param name="logger">ILogger object for logging output</param>
         /// </summary>
-        public Inquiry() : base()
+        public Inquiry(ILogger logger = null) : base(true, logger)
         {
             this.SetMode(Enums.InquiryTypes.ModeQ);
             this.SetCurrency("USD");
@@ -34,10 +36,11 @@ namespace Kount.Ris
         /// to change the RIS mode and currency respectively.
         /// </summary>
         /// <param name="checkConfiguration">If is true: will check config file if 
+        /// <param name="logger">ILogger object for logging output</param>
         /// `Ris.Url`, 
         /// `Ris.MerchantId`, 
         /// `Ris.Config.Key` and `Ris.Connect.Timeout` are set.</param>
-        public Inquiry(bool checkConfiguration) : base(checkConfiguration)
+        public Inquiry(bool checkConfiguration, ILogger logger = null) : base(checkConfiguration, logger)
         {
             this.SetMode(Enums.InquiryTypes.ModeQ);
             this.SetCurrency("USD");
@@ -51,11 +54,13 @@ namespace Kount.Ris
         /// to change the RIS mode and currency respectively.
         /// </summary>
         /// <param name="checkConfiguration">If is true: will check config file if 
+        /// <param name="configuration">Configuration class with raw values</param>
+        /// <param name="logger">ILogger object for logging output</param>
         /// `Ris.Url`, 
         /// `Ris.MerchantId`, 
         /// `Ris.Config.Key` and `Ris.Connect.Timeout` are set.</param>
-        /// <param name="configuration">Configuration class with raw values</param>
-        public Inquiry(bool checkConfiguration, Configuration configuration) : base(checkConfiguration, configuration)
+
+        public Inquiry(bool checkConfiguration, Configuration configuration, ILogger logger = null) : base(checkConfiguration, configuration, logger)
         {
             this.SetMode(Enums.InquiryTypes.ModeQ);
             this.SetCurrency("USD");

@@ -8,6 +8,7 @@ namespace KountRisStandardConfigTest
     using Kount.Ris;
     using Kount.Enums;
     using System;
+    using Microsoft.Extensions.Logging;
 
     public class TestHelper
     {
@@ -187,10 +188,10 @@ namespace KountRisStandardConfigTest
         /// <param name="sid">session id</param>
         /// <param name="orderNum">order number</param>
         /// <returns>inquiry</returns>
-        public static Inquiry CreateInquiry(string cardNumber, out string sid, out string orderNum)
+        public static Inquiry CreateInquiry(string cardNumber, out string sid, out string orderNum, ILogger logger = null)
         {
             // create inquiry with default settings
-            Inquiry inquiry = DefaultInquiry(out sid, out orderNum);
+            Inquiry inquiry = DefaultInquiry(out sid, out orderNum, logger);
 
             inquiry.SetPayment(Kount.Enums.PaymentTypes.Card, cardNumber);
 
@@ -203,9 +204,9 @@ namespace KountRisStandardConfigTest
         /// <param name="sid">session id</param>
         /// <param name="orderNum">order number</param>
         /// <returns>inquiry with default settings</returns>
-        public static Inquiry DefaultInquiry(out string sid, out string orderNum)
+        public static Inquiry DefaultInquiry(out string sid, out string orderNum, ILogger logger = null)
         {
-            Inquiry inquiry = new Inquiry();
+            Inquiry inquiry = new Inquiry(logger);
 
             inquiry.SetMerchantId(TEST_MERCHANT_ID); // 999666
             inquiry.SetApiKey(TEST_API_KEY);

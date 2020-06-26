@@ -4,6 +4,8 @@ namespace KountRisStandardTest
     using Kount.Ris;
     using Kount.Enums;
     using System;
+    using Microsoft.Extensions.Logging;
+
     public class TestHelper
     {
         public const string TEST_API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI5OTk2NjYiLCJhdWQiOiJLb3VudC4xIiwiaWF0IjoxNDk0NTM0Nzk5LCJzY3AiOnsia2EiOm51bGwsImtjIjpudWxsLCJhcGkiOmZhbHNlLCJyaXMiOnRydWV9fQ.eMmumYFpIF-d1up_mfxA5_VXBI41NSrNVe9CyhBUGck";
@@ -182,10 +184,10 @@ namespace KountRisStandardTest
         /// <param name="sid">session id</param>
         /// <param name="orderNum">order number</param>
         /// <returns>inquiry</returns>
-        public static Inquiry CreateInquiry(string cardNumber, out string sid, out string orderNum)
+        public static Inquiry CreateInquiry(string cardNumber, out string sid, out string orderNum, ILogger logger = null)
         {
             // create inquiry with default settings
-            Inquiry inquiry = DefaultInquiry(out sid, out orderNum);
+            Inquiry inquiry = DefaultInquiry(out sid, out orderNum,logger);
 
             //inquiry.SetCardPayment(cardNumber);
             inquiry.SetParameter("PTOK", cardNumber);
@@ -202,10 +204,10 @@ namespace KountRisStandardTest
         /// <param name="sid">session id</param>
         /// <param name="orderNum">order number</param>
         /// <returns>masked inquiry</returns>
-        public static Inquiry CreateInquiryMasked(string cardNumber, out string sid, out string orderNum)
+        public static Inquiry CreateInquiryMasked(string cardNumber, out string sid, out string orderNum, ILogger logger = null)
         {
             // create inquiry with default settings
-            Inquiry inquiry = DefaultInquiry(out sid, out orderNum);
+            Inquiry inquiry = DefaultInquiry(out sid, out orderNum,logger);
 
             inquiry.SetCardPaymentMasked(cardNumber);
 
@@ -221,9 +223,9 @@ namespace KountRisStandardTest
         /// <param name="sid">session id</param>
         /// <param name="orderNum">order number</param>
         /// <returns>inquiry with default settings</returns>
-        public static Inquiry DefaultInquiry(out string sid, out string orderNum)
+        public static Inquiry DefaultInquiry(out string sid, out string orderNum, ILogger logger = null)
         {
-            Inquiry inquiry = new Inquiry(false);
+            Inquiry inquiry = new Inquiry(false, Configuration.FromAppSettings(), logger);
 
             inquiry.SetMerchantId(TEST_MERCHANT_ID); // 999666
             inquiry.SetApiKey(TEST_API_KEY);

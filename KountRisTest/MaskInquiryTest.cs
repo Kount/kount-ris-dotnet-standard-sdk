@@ -17,6 +17,7 @@ namespace KountRisStandardTest
     using Microsoft.Extensions.Configuration;
     using System.Configuration;
     using System.IO;
+    using Xunit.Abstractions;
 
     /// <summary>
     /// Inquiry Test samples with MASK parameter 
@@ -27,7 +28,7 @@ namespace KountRisStandardTest
     /// <b>Copyright:</b> 2019 Kount Inc. All Rights Reserved<br/>
     /// </summary>
 
-    public class MaskInquiryTest
+    public class MaskInquiryTest : TestBase
     {
         /// <summary>
         /// Payment Token
@@ -47,26 +48,8 @@ namespace KountRisStandardTest
         /// </summary>
         /// 
 
-        public MaskInquiryTest()
-        {
-            var builder = new ConfigurationBuilder()
-             .SetBasePath(Directory.GetCurrentDirectory())
-             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-            IConfigurationRoot configuration = builder.Build();
-
-            ConfigurationManager.AppSettings["Ris.MerchantId"] = configuration.GetConnectionString("Ris.MerchantId");
-            ConfigurationManager.AppSettings["Ris.API.Key"] = configuration.GetConnectionString("Ris.API.Key");
-            ConfigurationManager.AppSettings["Ris.Config.Key"] = configuration.GetConnectionString("Ris.Config.Key");
-            ConfigurationManager.AppSettings["Ris.Url"] = configuration.GetConnectionString("Ris.Url");
-            ConfigurationManager.AppSettings["Ris.Version"] = configuration.GetConnectionString("Ris.Version");
-            ConfigurationManager.AppSettings["Ris.CertificateFile"] = configuration.GetConnectionString("Ris.CertificateFile");
-            ConfigurationManager.AppSettings["Ris.PrivateKeyPassword"] = configuration.GetConnectionString("Ris.PrivateKeyPassword");
-            ConfigurationManager.AppSettings["Ris.Connect.Timeout"] = configuration.GetConnectionString("Ris.Connect.Timeout");
-            ConfigurationManager.AppSettings["LOG.LOGGER"] = configuration.GetConnectionString("LOG.LOGGER");
-            ConfigurationManager.AppSettings["LOG.SIMPLE.LEVEL"] = configuration.GetConnectionString("LOG.SIMPLE.LEVEL");
-            ConfigurationManager.AppSettings["LOG.SIMPLE.ELAPSED"] = configuration.GetConnectionString("LOG.SIMPLE.ELAPSED");
-        }
+        public MaskInquiryTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
+        
         [Fact]
         public void MaskRisQOneItemRequiredFieldsOneRuleReview()
         {
